@@ -1,0 +1,9 @@
+---
+- hosts: servers
+  vars:
+    - chroot_basepath: "/home/chroot"
+    - chrootname: "freeIpa"
+
+  roles: []
+  tasks:
+    - include:  tasks/main.yml

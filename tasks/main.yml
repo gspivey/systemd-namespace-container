@@ -1,0 +1,65 @@
+---
+  - name: Create Directory var/lib/rpm
+    file:
+      path: "{{ chroot_basepath }}/{{ chrootname }}/var/lib/rpm"
+      state: directory
+      recurse: true
+
+  - name: Create Directory repos
+    file:
+      path: "{{ chroot_basepath }}/{{ chrootname }}/repos"
+      state: directory
+      recurse: true
+
+  - name: Initialize rpm database
+    shell: rpm --root {{ chroot_basepath }}/{{ chrootname }} --initdb
+
+  - name: Get centos release rpm
+    shell: yumdownloader --destdir={{ chroot_basepath }}/{{ chrootname }}/repos centos-release
+
+  - name: Install centos release rpm
+    shell: rpm --root {{ chroot_basepath }}/{{ chrootname }} -ivh --nodeps {{ chroot_basepath }}/{{ chrootname }}/repos/centos-release*rpm
+    ignore_errors: yes
+
+  - name: Install epel release rpm
+    yum:
+      name: epel-release
+      installroot: "{{ chroot_basepath }}/{{ chrootname }}"
+
+  - name: Install packages for Infrastructure Server
+    yum:
+      name: "@^Infrastructure Server"
+      installroot: "{{ chroot_basepath }}/{{ chrootname }}"
+
+  - name: Install yum rpm
+    yum:
+      name: yum
+      installroot: "{{ chroot_basepath }}/{{ chrootname }}"
+
+  - name: Install Other Useful packages
+    yum:
+      name: "glibc-devel, gpm-devel, krb5-devel, libcom_err-devel, zlib-devel"
+      installroot: "{{ chroot_basepath }}/{{ chrootname }}"
+
+  - copy:
+      src: "/etc/resolv.conf"
+      dest: "{{ chroot_basepath }}/{{ chrootname }}/etc"
+      remote_src: no
+
+  - copy:
+      src: "defaults/passwd"
+      dest: "{{ chroot_basepath }}/{{ chrootname }}/etc"
+      owner: root
+      group: root
+      mode: 0644
+
+  - copy:
+      src: "defaults/shadow"
+      dest: "{{ chroot_basepath }}/{{ chrootname }}/etc"
+      owner: root
+      group: root
+      mode: 0000
+
+ # create systemd unit to start this container ... maybe
+ # - name: Install Infrastructure Group
+ #   shell: bash systemd-nspawn -bD {{ chroot_basepath }}/{{ chrootname }}
