@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: Gerard Spivey
+  description: Build CentOS7 Namespace Container on a CentOS7 Host
+  company: www.gspivey.com
+  license: MIT
+  min_ansible_version: 2.4 
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  galaxy_tags:
+    - systemd
+    - chroot
+    - container
+dependencies:
